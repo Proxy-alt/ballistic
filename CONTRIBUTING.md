@@ -1,86 +1,141 @@
-If you are reading this, you want to contribute to this project. Good. I want to get Ballistic to a working state as soon as possible so future developers will use Ballistic in their Switch 2 emulators.
+# How to become a contributor and submit your own code
 
-But lets get one thing straight right now: **The Git history is sacred.** If you don't follow these rules, your Pull Request will be closed, and you will be told to go learn how to use Git properly.
+## Contributor License Agreements
 
-# Forking and Branching (Do NOT use `main`)
+We'd love to accept your patches! Before we can take them, we have to jump a
+couple of legal hurdles.
 
-Your `main` branch should be a pristine, 1:1 mirror of the upstream `main` branch. Never commit directly to your `main` branch.
+Please fill out either the individual or corporate Contributor License Agreement
+(CLA).
 
-The correct workflow:
+*   If you are an individual writing original source code and you're sure you
+    own the intellectual property, then you'll need to sign an
+    [individual CLA](https://developers.google.com/open-source/cla/individual).
+*   If you work for a company that wants to allow you to contribute your work,
+    then you'll need to sign a
+    [corporate CLA](https://developers.google.com/open-source/cla/corporate).
 
-1. Fork the repository.
-2. Clone your fork locally.
-3. Add the upstream remote: `git remote add origin https://github.com/pound-emu/ballistic.git`
-4. Sync your local main: `git checkout main && git pull origin main`
-5. Create a feature branch: `git checkout -b feature-name`
+Follow either of the two links above to access the appropriate CLA and
+instructions for how to sign and return it. Once we receive it, we'll be able to
+accept your pull requests.
 
-You do your work on `feature-name`. You push `feature-name` to your fork. You open a Pull Request from `feature-name`. Please leave `main` alone.
+## Are you a Googler?
 
-# Bisectability
+If you are a Googler, please make an attempt to submit an internal contribution
+rather than a GitHub Pull Request. If you are not able to submit internally, a
+PR is acceptable as an alternative.
 
-Every single commit in your PR must **individually** compile and pass tests.
+## Contributing A Patch
 
-If I am tracking down a bug two years from now using `git bisect`, and I land on your commit where Ballistic doesn't even compile because you "added the header but forgot the source file", I have to manually skip that commit. If you do this multiple times, you've ruined the bisection and wasted my time.
+1.  Submit an issue describing your proposed change to the
+    [issue tracker](https://github.com/google/googletest/issues).
+2.  Please don't mix more than one logical change per submittal, because it
+    makes the history hard to follow. If you want to make a change that doesn't
+    have a corresponding issue in the issue tracker, please create one.
+3.  Also, coordinate with team members that are listed on the issue in question.
+    This ensures that work isn't being duplicated and communicating your plan
+    early also generally leads to better patches.
+4.  If your proposed change is accepted, and you haven't already done so, sign a
+    Contributor License Agreement
+    ([see details above](#contributor-license-agreements)).
+5.  Fork the desired repo, develop and test your code changes.
+6.  Ensure that your code adheres to the existing style in the sample to which
+    you are contributing.
+7.  Ensure that your code has an appropriate set of unit tests which all pass.
+8.  Submit a pull request.
 
-Before you push, run an interactive rebase with the --exec flag to test every commit in your PR automatically:
+## The Google Test and Google Mock Communities
 
-```console
-git rebase -i main --exec "cd build && make -j$(nproc) && ctest"
+The Google Test community exists primarily through the
+[discussion group](https://groups.google.com/group/googletestframework) and the
+GitHub repository. Likewise, the Google Mock community exists primarily through
+their own [discussion group](https://groups.google.com/group/googlemock). You
+are definitely encouraged to contribute to the discussion and you can also help
+us to keep the effectiveness of the group high by following and promoting the
+guidelines listed here.
+
+### Please Be Friendly
+
+Showing courtesy and respect to others is a vital part of the Google culture,
+and we strongly encourage everyone participating in Google Test development to
+join us in accepting nothing less. Of course, being courteous is not the same as
+failing to constructively disagree with each other, but it does mean that we
+should be respectful of each other when enumerating the 42 technical reasons
+that a particular proposal may not be the best choice. There's never a reason to
+be antagonistic or dismissive toward anyone who is sincerely trying to
+contribute to a discussion.
+
+Sure, C++ testing is serious business and all that, but it's also a lot of fun.
+Let's keep it that way. Let's strive to be one of the friendliest communities in
+all of open source.
+
+As always, discuss Google Test in the official GoogleTest discussion group. You
+don't have to actually submit code in order to sign up. Your participation
+itself is a valuable contribution.
+
+## Style
+
+To keep the source consistent, readable, diffable and easy to merge, we use a
+fairly rigid coding style, as defined by the
+[google-styleguide](https://github.com/google/styleguide) project. All patches
+will be expected to conform to the style outlined
+[here](https://google.github.io/styleguide/cppguide.html). Use
+[.clang-format](https://github.com/google/googletest/blob/main/.clang-format) to
+check your formatting.
+
+## Requirements for Contributors
+
+If you plan to contribute a patch, you need to build Google Test, Google Mock,
+and their own tests from a git checkout, which has further requirements:
+
+*   [Python](https://www.python.org/) v3.6 or newer (for running some of the
+    tests and re-generating certain source files from templates)
+*   [CMake](https://cmake.org/) v2.8.12 or newer
+
+## Developing Google Test and Google Mock
+
+This section discusses how to make your own changes to the Google Test project.
+
+### Testing Google Test and Google Mock Themselves
+
+To make sure your changes work as intended and don't break existing
+functionality, you'll want to compile and run Google Test and GoogleMock's own
+tests. For that you can use CMake:
+
+```
+mkdir mybuild
+cd mybuild
+cmake -Dgtest_build_tests=ON -Dgmock_build_tests=ON ${GTEST_REPO_DIR}
 ```
 
-I will also run this command on your commits and if it fails I will reject your PR.
+To choose between building only Google Test or Google Mock, you may modify your
+cmake command to be one of each
 
-# Atomic Commits
-
-Do not combine unrelated changes into a single commit. A commit must be a single, logical unit of work.
-
-- If your commit says "fix X **and** Y", split it.
-- If you are adding a new feature that requires a core engine change, do it in two commits:
-    1. `engine: add new capability`
-    2. `decoder: use new capability for X`
-- If i need to `git revert` your commit, it should cleanly remove the feature without breaking three other unrelated things.
-
-# Commit Message
-
-A commit mesaage needs to explain the **why**, not just the **what**.
-
-```text
-prefix: short, imperative summary (under 72 chars)
-
-Blank line.
-
-Detailed explanation of the problem being solved, why this approach 
-was chosen, and any edge cases considered. Wrap this text at 72 
-characters.
-
-Signed-off-by: Your Name <your.email@example.com>
+```
+cmake -Dgtest_build_tests=ON ${GTEST_DIR} # sets up Google Test tests
+cmake -Dgmock_build_tests=ON ${GMOCK_DIR} # sets up Google Mock tests
 ```
 
-## Prefix Rules
+Make sure you have Python installed, as some of Google Test's tests are written
+in Python. If the cmake command complains about not being able to find Python
+(`Could NOT find PythonInterp (missing: PYTHON_EXECUTABLE)`), try telling it
+explicitly where your Python executable can be found:
 
-Map your prefix to the subsystem or directory you are touching:
+```
+cmake -DPYTHON_EXECUTABLE=path/to/python ...
+```
 
-* `assembler:` (`src/bal_assembler.c`)
-* `decoder:` (`src/bal_decoder*`)
-* `engine:` (everything else in `src/`)
-* `tests:` (`tests/*`)
-* `tests/translate:` (`tests/translate/*`)
-* `tests/decoder:` (`tests/test_decoder.c`)
-* `docs:` (for documentation)
+Next, you can build Google Test and / or Google Mock and all desired tests. On
+\*nix, this is usually done by
 
-## The Sign-off
+```
+make
+```
 
-Every commit must include a `Signed-off-by` tag. This means you are legally liable for the code you submit to Ballistic. Use `git commit -s` to add it automatically.
+To run the tests, do
 
-# The Pull Request Process
+```
+make test
+```
 
-If I review your PR and ask for changes, do not add a new commit that says "fix review comments."
-
-1. Make the changes locally.
-2. Use `git commit --fixup` or `git rebase -i` to fold these changes back into the original commits where they belong.
-3. `git push --force-with-lease` to update the PR.
-4. The final history should look like you got it right the first time.
-
-# Code Style and Standard
-
-I chose BARR-C 2018 as the code standard to reduce as much bugs as possible. This will be enforce by our CI. If you push code that is not formatted correctly, the CI will fail to build your commit. Use `clang-format` to format your files.
+All tests should pass.
